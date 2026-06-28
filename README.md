@@ -200,12 +200,5 @@ Questions or want to use these templates?
 - 📧 Email: sanjaypoola1@gmail.com
 - 🔗 GitHub: @sanjay032007
 - 📱 Instagram: [@sanjay.__.03](https://instagram.com/sanjay.__.03)
-- ▶️ YouTube: [@meowix-s2h](https://youtube.com/@meowix-s2h)
 
-## License
 
-MIT License - Feel free to use, modify, and distribute these templates!
-
----
-
-**[← Back to Portfolio](https://github.com/sanjay032007)**
