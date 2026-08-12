@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useRef, useState, Suspense, useMemo, useEffect } from 'react';
@@ -200,7 +200,7 @@ function AIModel({ synapseCount, signalSpeed, lobeSeparation, activationFunction
   );
 }
 
-export function AIStartup3D({ t }: { t: Template }) {
+export function AIStartup3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   const { primary, bg, text, secondary } = t.colorScheme;
   const [promptInput, setPromptInput] = useState("Write a neural network layer in Rust");
   const [outputCode, setOutputCode] = useState("");
@@ -237,7 +237,7 @@ export function AIStartup3D({ t }: { t: Template }) {
   return (
     <div className="@container w-full h-full relative overflow-hidden bg-neutral-950 text-white" style={{ color: text }}>
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 2.6], fov: 45 }} resize={{ offsetSize: true }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 2.6], fov: 45 }} resize={{ offsetSize: true }}>
           <ambientLight intensity={0.4} />
           <pointLight position={[5, 5, 5]} intensity={2.0} color={colors.left} />
           <pointLight position={[-5, -5, -5]} intensity={0.5} color={colors.right} />
@@ -462,3 +462,4 @@ export function AIStartup3D({ t }: { t: Template }) {
     </div>
   );
 }
+

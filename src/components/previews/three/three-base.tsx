@@ -1,4 +1,4 @@
-
+﻿
 "use client"
 import { Template } from "@/lib/data"
 import { Canvas } from "@react-three/fiber"
@@ -8,7 +8,7 @@ export function ThreeBase({ t }: { t: Template }) {
   const { primary, bg, text } = t.colorScheme
   return (
     <div className="w-full h-full relative" style={{ background: bg }}>
-      <Canvas frameloop="demand" camera={{ position: [0, 0, 5] }}>
+      <Canvas frameloop={"always"} camera={{ position: [0, 0, 5] }}>
         <ambientLight intensity={0.5} />
         <directionalLight position={[10, 10, 5]} intensity={1} />
         <Float speed={2} rotationIntensity={1} floatIntensity={2}>
@@ -25,3 +25,4 @@ export function ThreeBase({ t }: { t: Template }) {
     </div>
   )
 }
+

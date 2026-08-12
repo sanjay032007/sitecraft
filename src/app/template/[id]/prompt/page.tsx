@@ -5,6 +5,7 @@
 import Navbar from "@/components/navbar"
 
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 import { ArrowLeft, Copy, Check } from "lucide-react"
 
@@ -28,6 +29,11 @@ export default function PromptGenerator({ params }: { params: Promise<{ id: stri
   
 
   const [copied, setCopied] = useState(false)
+  const [antigravityCopied, setAntigravityCopied] = useState(false)
+  const [codexCopied, setCodexCopied] = useState(false)
+  const [showAppDialog, setShowAppDialog] = useState(false)
+  const [appDialogType, setAppDialogType] = useState<"antigravity" | "codex" | null>(null)
+  const [launchToast, setLaunchToast] = useState<string | null>(null)
 
   const [user, setUser] = useState<User | null>(null)
   const [loadingUser, setLoadingUser] = useState(true)
@@ -128,6 +134,48 @@ Please provide the complete, modular code for this layout, ensuring all componen
 
     setTimeout(() => setCopied(false), 2000)
 
+  }
+
+  const launchWithFallback = (scheme, type) => {
+    navigator.clipboard.writeText(generatedPrompt)
+    let appOpened = false
+
+    // window blur fires immediately when OS switches to another app — most reliable signal
+    const onBlur = () => { appOpened = true }
+    const onVisibilityChange = () => { if (document.visibilityState === 'hidden') appOpened = true }
+
+    window.addEventListener('blur', onBlur)
+    document.addEventListener('visibilitychange', onVisibilityChange)
+
+    // Encode prompt into the URL so the app receives it directly
+    const urlWithPrompt = scheme + '?prompt=' + encodeURIComponent(generatedPrompt)
+    window.location.href = urlWithPrompt
+
+    // Give the OS 2.5s to open the app — if still focused, assume not installed
+    setTimeout(() => {
+      window.removeEventListener('blur', onBlur)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      if (!appOpened) {
+        setAppDialogType(type)
+        setShowAppDialog(true)
+      } else {
+        // App opened successfully — show clipboard hint toast
+        setLaunchToast('App opened! Press Ctrl+V to paste the prompt.')
+        setTimeout(() => setLaunchToast(null), 4000)
+      }
+    }, 2500)
+  }
+
+  const handleLaunchAntigravity = () => {
+    setAntigravityCopied(true)
+    setTimeout(() => setAntigravityCopied(false), 2000)
+    launchWithFallback('antigravity://prompt', 'antigravity')
+  }
+
+  const handleLaunchCodex = () => {
+    setCodexCopied(true)
+    setTimeout(() => setCodexCopied(false), 2000)
+    launchWithFallback('codex://prompt', 'codex')
   }
 
 
@@ -256,16 +304,41 @@ Please provide the complete, modular code for this layout, ensuring all componen
                   {generatedPrompt}
                 </pre>
                 <div className="mt-6 flex flex-col sm:flex-row gap-4">
-                  <Button className="flex-1 h-12">Launch in Antigravity</Button>
-                  <Button variant="secondary" className="flex-1 h-12 border-border/50">Send to Codex</Button>
+                  <Button className="flex-1 h-12" onClick={handleLaunchAntigravity}>
+                    {antigravityCopied ? <><Check className="mr-2 h-4 w-4" /> Prompt Copied! Launching...</> : "Launch in Antigravity"}
+                  </Button>
+                  <Button variant="secondary" className="flex-1 h-12 border-border/50" onClick={handleLaunchCodex}>
+                    {codexCopied ? <><Check className="mr-2 h-4 w-4" /> Prompt Copied! Launching...</> : "Send to Codex"}
+                  </Button>
                 </div>
               </>
-            )}\n          </div>
+            )}
+          </div>
 
         </div>
 
       </div>
 
+      {launchToast && (
+        <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-5 py-3 rounded-xl bg-primary text-primary-foreground text-sm font-medium shadow-2xl animate-in fade-in slide-in-from-bottom-4">
+          {launchToast}
+        </div>
+      )}
+
+      <Dialog open={showAppDialog} onOpenChange={setShowAppDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>App Not Found</DialogTitle>
+            <DialogDescription>
+              It looks like you don't have the {appDialogType === "antigravity" ? "Antigravity" : "Codex"} desktop app installed. 
+              The prompt has been copied to your clipboard, so you can manually paste it into the app.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end mt-4">
+            <Button onClick={() => setShowAppDialog(false)}>Got it</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </main>
 
   )

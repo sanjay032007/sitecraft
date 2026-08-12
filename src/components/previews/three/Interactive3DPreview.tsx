@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+﻿/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 
 "use client";
 
@@ -172,13 +172,13 @@ class ErrorBoundary extends React.Component<any, any> {
 
 
 
-export const Interactive3DPreview = ({ t }: { t: Template }) => {
+export const Interactive3DPreview = ({ t, isPreview = false }: { t: Template; isPreview?: boolean }) => {
 
   switch (t.category) {
 
     case "Business":
 
-      return <Business3D t={t} />;
+      return <Business3D t={t} isPreview={isPreview} />;
 
     case "Portfolio":
 
@@ -186,45 +186,45 @@ export const Interactive3DPreview = ({ t }: { t: Template }) => {
 
     case "SaaS":
 
-      return <SaaS3D t={t} />;
+      return <SaaS3D t={t} isPreview={isPreview} />;
 
     case "Agency":
 
-      if (t.id === "agency-space-3d") return <SpaceAgency3D t={t} />;
+      if (t.id === "agency-space-3d") return <SpaceAgency3D t={t} isPreview={isPreview} />;
 
-      return <Agency3D t={t} />;
+      return <Agency3D t={t} isPreview={isPreview} />;
 
     case "Ecommerce":
 
-      if (t.id === "ecommerce-headphones-3d") return <Headphones3D />;
+      if (t.id === "ecommerce-headphones-3d") return <Headphones3D isPreview={isPreview} />;
 
-      if (t.id === "ecommerce-vr-headset-3d") return <VRGlassmorphism />;
+      if (t.id === "ecommerce-vr-headset-3d") return <VRGlassmorphism isPreview={isPreview} />;
 
-      return <Ecommerce3D t={t} />;
+      return <Ecommerce3D t={t} isPreview={isPreview} />;
 
     case "Healthcare":
 
-      return <ErrorBoundary><Healthcare3D t={t} /></ErrorBoundary>;
+      return <ErrorBoundary><Healthcare3D t={t} isPreview={isPreview} /></ErrorBoundary>;
 
     case "Education":
 
-      return <Education3D t={t} />;
+      return <Education3D t={t} isPreview={isPreview} />;
 
     case "Restaurant":
 
-      return <Restaurant3D t={t} />;
+      return <Restaurant3D t={t} isPreview={isPreview} />;
 
     case "Real Estate":
 
-      return <RealEstate3D t={t} />;
+      return <RealEstate3D t={t} isPreview={isPreview} />;
 
     case "AI Startup":
 
-      return <AIStartup3D t={t} />;
+      return <AIStartup3D t={t} isPreview={isPreview} />;
 
     default:
 
-      return <Business3D t={t} />;
+      return <Business3D t={t} isPreview={isPreview} />;
 
   }
 

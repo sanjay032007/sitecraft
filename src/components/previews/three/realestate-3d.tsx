@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, react/no-unescaped-entities */
+﻿/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, react/no-unescaped-entities */
 "use client";
 
 import React, { useRef, useState, useMemo, useEffect } from 'react';
@@ -593,7 +593,7 @@ function SceneCamera({ scrollProgress }: { scrollProgress: React.MutableRefObjec
   return null;
 }
 
-export function RealEstate3D({ t }: { t: Template }) {
+export function RealEstate3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   const [filterType, setFilterType] = useState<"All" | "Villa" | "Penthouse" | "Loft">("All");
   const [reserved, setReserved] = useState(false);
   const [scrollPercent, setScrollPercent] = useState(0);
@@ -623,7 +623,7 @@ export function RealEstate3D({ t }: { t: Template }) {
     <div className="@container w-full h-full relative overflow-hidden bg-[#02100d] text-white">
       {/* 3D Scene Background Canvas */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas frameloop="demand" shadows camera={{ position: [0, 1.5, 6.2], fov: 42 }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} shadows camera={{ position: [0, 1.5, 6.2], fov: 42 }}>
           {/* Twilight atmosphere particles */}
           <ThreeSparkles 
             color="#10b981" 
@@ -753,7 +753,7 @@ export function RealEstate3D({ t }: { t: Template }) {
                 Browse Listings
               </a>
               <span className="text-[9px] text-emerald-400/80 font-mono tracking-widest animate-bounce">
-                ↓ Scroll to explode
+                â†“ Scroll to explode
               </span>
             </div>
           </div>
@@ -906,3 +906,4 @@ export function RealEstate3D({ t }: { t: Template }) {
     </div>
   );
 }
+

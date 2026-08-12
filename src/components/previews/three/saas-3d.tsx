@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, Suspense } from 'react';
 import { Template } from '@/lib/data';
@@ -166,7 +166,7 @@ function Smartphone() {
 
 // --- Main Page Component ---
 
-export const SaaS3D = ({ t }: { t: Template }) => {
+export const SaaS3D = ({ t, isPreview = false }: { t: Template; isPreview?: boolean }) => {
   return (
     <div className="@container w-full h-full relative bg-[#030206] text-slate-200 overflow-hidden font-sans">
       
@@ -195,7 +195,7 @@ export const SaaS3D = ({ t }: { t: Template }) => {
 
       {/* 3D Background Canvas */}
       <div className="absolute inset-0 z-10 pointer-events-auto">
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 45 }} resize={{ offsetSize: true }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 5], fov: 45 }} resize={{ offsetSize: true }}>
           <ambientLight intensity={1} />
           {/* Environment for stunning metallic reflections on the phone chassis */}
           <Suspense fallback={null}>
@@ -237,3 +237,4 @@ export const SaaS3D = ({ t }: { t: Template }) => {
     </div>
   );
 };
+

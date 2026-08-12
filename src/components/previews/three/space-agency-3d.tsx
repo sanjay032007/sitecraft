@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, useMemo, useEffect, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
@@ -376,7 +376,7 @@ function CelestialPlanet({
 }
 
 // Main 3D Space Tourism Template Component
-export function SpaceAgency3D({ t }: { t?: any }) {
+export function SpaceAgency3D({ t, isPreview = false }: { t?: any; isPreview?: boolean }) {
   const [planetType, setPlanetType] = useState<keyof typeof PLANETS>('habitable');
   const [warpActive, setWarpActive] = useState(false);
   const [warpSpeed, setWarpSpeed] = useState(1.0);
@@ -428,7 +428,7 @@ export function SpaceAgency3D({ t }: { t?: any }) {
 
       {/* 3D WebGL Canvas Area */}
       <div className="relative lg:absolute lg:inset-0 w-full flex-1 min-h-[280px] sm:min-h-[350px] lg:h-full z-0">
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 8], fov: 45 }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 8], fov: 45 }}>
           <color attach="background" args={["#03000a"]} />
           <ambientLight intensity={0.5} />
           
@@ -608,7 +608,7 @@ export function SpaceAgency3D({ t }: { t?: any }) {
                   <div className="space-y-1">
                     <div className="flex justify-between text-[9px] text-white/50 font-bold uppercase">
                       <span>Orbit Alignment</span>
-                      <span className="text-blue-400">{Math.floor((shipRotation / (Math.PI * 2)) * 360)}° Heading</span>
+                      <span className="text-blue-400">{Math.floor((shipRotation / (Math.PI * 2)) * 360)}Â° Heading</span>
                     </div>
                     <input 
                       type="range"
@@ -823,7 +823,7 @@ export function SpaceAgency3D({ t }: { t?: any }) {
                 
                 {bookingSubmitted ? (
                   <div className="flex-1 flex flex-col items-center justify-center py-6 text-center space-y-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-emerald-400 font-bold">✓</div>
+                    <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-emerald-400 font-bold">âœ“</div>
                     <div>
                       <h4 className="text-white text-xs font-bold">RESERVATION TRANSMITTED</h4>
                       <p className="text-[8px] text-emerald-400 font-semibold mt-1">SECURE TOKEN: AV-{Math.floor(Math.random()*900000+100000)}</p>
@@ -919,3 +919,4 @@ export function SpaceAgency3D({ t }: { t?: any }) {
     </div>
   );
 }
+

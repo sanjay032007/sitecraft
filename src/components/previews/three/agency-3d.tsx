@@ -163,7 +163,7 @@ function AgencyLaptop() {
 }
 
 // â”€â”€ Main Component â”€â”€
-export function Agency3D({ t }: { t: Template }) {
+export function Agency3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   return (
     <div className="@container w-full h-full relative bg-[#050508] text-neutral-200 overflow-hidden font-sans" style={{ minHeight: '600px' }}>
 
@@ -196,7 +196,8 @@ export function Agency3D({ t }: { t: Template }) {
 
       {/* 3D Canvas */}
       <div className="absolute inset-0 z-10 pointer-events-auto">
-        <Canvas frameloop="demand"
+        <Canvas
+          frameloop={isPreview ? "demand" : "always"}
           camera={{ position: [0, 0, 6], fov: 45 }}
           resize={{ offsetSize: true }}
           gl={{ antialias: true, powerPreference: 'high-performance' }}
@@ -277,4 +278,5 @@ export function Agency3D({ t }: { t: Template }) {
 }
 
 useGLTF.preload('/models/laptop.glb');
+
 

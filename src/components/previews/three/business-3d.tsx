@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, useEffect, Suspense } from 'react';
 import { Template } from '@/lib/data';
@@ -115,7 +115,7 @@ function EarthScene({ scrollY }: { scrollY: number }) {
   );
 }
 
-export function Business3D({ t }: { t: Template }) {
+export function Business3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   const { primary, bg, text, secondary, accent } = t.colorScheme;
   const [scrollY, setScrollY] = useState(0);
 
@@ -128,7 +128,7 @@ export function Business3D({ t }: { t: Template }) {
       
       {/* Background Canvas perfectly constrained to the container */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 45 }} resize={{ offsetSize: true }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 5], fov: 45 }} resize={{ offsetSize: true }}>
           <EarthScene scrollY={scrollY} />
         </Canvas>
       </div>
@@ -240,3 +240,4 @@ export function Business3D({ t }: { t: Template }) {
     </div>
   );
 }
+

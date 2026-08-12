@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useRef, useState, Suspense } from 'react';
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
@@ -127,7 +127,7 @@ function VRControllers({ color }: { color: string }) {
 }
 
 // --- Main Template Component ---
-export default function VRGlassmorphism() {
+export default function VRGlassmorphism({ isPreview = false }: { isPreview?: boolean } = {}) {
   const [activeTab, setActiveTab] = useState('Credit Card');
 
   return (
@@ -177,7 +177,7 @@ export default function VRGlassmorphism() {
         
         {/* Left Content / 3D Canvas Container */}
         <div className="absolute inset-0 w-full h-full z-10 pointer-events-auto">
-          <Canvas frameloop="demand" camera={{ position: [0, 0, 6], fov: 45 }}>
+          <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 6], fov: 45 }}>
             <ambientLight intensity={0.6} />
           <Suspense fallback={null}>
             <Environment preset="city" />
@@ -319,3 +319,4 @@ export default function VRGlassmorphism() {
     </div>
   );
 }
+

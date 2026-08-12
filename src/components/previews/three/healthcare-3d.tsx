@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/purity, react-hooks/immutability, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+﻿/* eslint-disable react-hooks/purity, react-hooks/immutability, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 
 
 
@@ -258,7 +258,7 @@ import {
 
 
 
-export function Healthcare3D({ t }: { t?: any }) {
+export function Healthcare3D({ t, isPreview = false }: { t?: any; isPreview?: boolean }) {
 
 
 
@@ -474,7 +474,7 @@ export function Healthcare3D({ t }: { t?: any }) {
 
 
 
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 18], fov: 45 }} gl={{ localClippingEnabled: true }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 18], fov: 45 }} gl={{ localClippingEnabled: true }}>
 
 
 
@@ -1166,7 +1166,7 @@ export function Healthcare3D({ t }: { t?: any }) {
 
 
 
-                <span className="text-[8px] sm:text-[9px] text-emerald-500/80 block mt-1">✓ SECURE LINK</span>
+                <span className="text-[8px] sm:text-[9px] text-emerald-500/80 block mt-1">âœ“ SECURE LINK</span>
 
 
 
@@ -1202,7 +1202,7 @@ export function Healthcare3D({ t }: { t?: any }) {
 
 
 
-                <span className="text-[8px] sm:text-[9px] text-purple-400/80 block mt-1">● DENSE GRAPH</span>
+                <span className="text-[8px] sm:text-[9px] text-purple-400/80 block mt-1">â— DENSE GRAPH</span>
 
 
 
@@ -2840,6 +2840,7 @@ function ParticleBrain({ synapseSpeed, viewMode }: ParticleBrainProps) {
 
 
 useGLTF.preload('/models/brain.glb');
+
 
 
 

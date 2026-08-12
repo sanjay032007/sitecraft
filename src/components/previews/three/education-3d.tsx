@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, @typescript-eslint/no-explicit-any */
+﻿/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, @typescript-eslint/no-explicit-any */
 "use client";
 
 import React, { useRef, useMemo, Suspense } from 'react';
@@ -360,7 +360,7 @@ function SceneCamera() {
   return null;
 }
 
-export function Education3D({ t }: { t: Template }) {
+export function Education3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const scrollProgress = useRef(0);
 
@@ -378,7 +378,7 @@ export function Education3D({ t }: { t: Template }) {
   return (
     <div className="@container w-full h-full relative overflow-hidden bg-black text-white font-mono">
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas frameloop="demand" camera={{ position: [0, 8, 24], fov: 45 }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 8, 24], fov: 45 }}>
           {/* Post-Processing for realism */}
           <EffectComposer>
             <Bloom luminanceThreshold={1.0} luminanceSmoothing={0.5} intensity={2.0} />
@@ -470,3 +470,4 @@ export function Education3D({ t }: { t: Template }) {
     </div>
   );
 }
+

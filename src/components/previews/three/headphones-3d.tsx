@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import React, { useState, useRef, Suspense } from 'react';
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -115,7 +115,7 @@ function Headphones({ color }: { color: string }) {
 }
 
 // --- Main Template Component ---
-export default function Headphones3D() {
+export default function Headphones3D({ isPreview = false }: { isPreview?: boolean } = {}) {
   const [selectedColor, setSelectedColor] = useState("#f43f5e");
   const [isAddingToCart, setIsAddingToCart] = useState(false);
   const [cartCount, setCartCount] = useState(0);
@@ -177,7 +177,7 @@ export default function Headphones3D() {
             <div className="text-[25vw] font-black tracking-tighter leading-none select-none text-white">MAX</div>
           </div>
           
-          <Canvas frameloop="demand" camera={{ position: [0, 0, 5], fov: 45 }}>
+          <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 5], fov: 45 }}>
             <ambientLight intensity={0.8} />
             <spotLight position={[10, 10, 10]} angle={0.2} penumbra={1} intensity={2} castShadow />
           <Suspense fallback={null}>
@@ -315,3 +315,4 @@ export default function Headphones3D() {
     </div>
   );
 }
+

@@ -1,13 +1,34 @@
 ﻿"use client";
 
-import { useRef, useState, useEffect, startTransition, memo } from "react"
+import { useRef, useState, useEffect, startTransition, memo, useCallback } from "react"
 import { Template } from "@/lib/data"
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import TemplatePreview from "./template-preview"
-import { Sparkles, Layers, FileText, Cuboid, MonitorPlay } from "lucide-react"
+import { Layers, FileText, Cuboid, MonitorPlay } from "lucide-react"
+
+/**
+ * Global scroll state tracker.
+ * While the user is actively scrolling, no cards will mount their live previews.
+ * This completely eliminates scroll jank since zero heavy work happens during scroll.
+ */
+let isScrolling = false
+let scrollTimer: ReturnType<typeof setTimeout> | null = null
+const scrollListeners = new Set<() => void>()
+
+if (typeof window !== "undefined") {
+  window.addEventListener("scroll", () => {
+    isScrolling = true
+    if (scrollTimer) clearTimeout(scrollTimer)
+    scrollTimer = setTimeout(() => {
+      isScrolling = false
+      // Notify all cards that scrolling has stopped
+      scrollListeners.forEach((cb) => cb())
+    }, 250) // Wait 250ms after last scroll event before allowing mounts
+  }, { passive: true })
+}
 
 function TemplateCard({ template }: { template: Template }) {
   const ref = useRef<HTMLDivElement>(null)
@@ -15,74 +36,89 @@ function TemplateCard({ template }: { template: Template }) {
   const [isHovered, setIsHovered] = useState(false)
   const mountTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const unmountTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const shouldRenderRef = useRef(shouldRender)
+  const isInViewRef = useRef(false)
+  const shouldRenderRef = useRef(false)
 
-  // Keep the ref in sync with state
+  // Keep ref in sync
   useEffect(() => {
     shouldRenderRef.current = shouldRender
   }, [shouldRender])
 
+  // Try to mount the live preview (only if not scrolling and still in view)
+  const tryMount = useCallback(() => {
+    if (shouldRenderRef.current || !isInViewRef.current || isScrolling) return
+    if (mountTimerRef.current) return // already scheduled
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+    const delay = isMobile ? 600 : 300
+    const stagger = Math.random() * 300
+
+    mountTimerRef.current = setTimeout(() => {
+      mountTimerRef.current = null
+      // Re-check conditions right before mounting
+      if (!isInViewRef.current || isScrolling) return
+      startTransition(() => {
+        setShouldRender(true)
+      })
+    }, delay + stagger)
+  }, [])
+
   useEffect(() => {
+    // Listen for "scroll stopped" events to retry mounting
+    scrollListeners.add(tryMount)
+
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
+            isInViewRef.current = true
             // Cancel any pending unmount
             if (unmountTimerRef.current) {
-              clearTimeout(unmountTimerRef.current);
-              unmountTimerRef.current = null;
+              clearTimeout(unmountTimerRef.current)
+              unmountTimerRef.current = null
             }
-            // Mount only if the card stays in view (debounces fast scrolling)
-            if (!shouldRenderRef.current && !mountTimerRef.current) {
-              const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-              const baseDelay = isMobile ? 800 : 400;
-              const stagger = Math.random() * 250;
-              
-              mountTimerRef.current = setTimeout(() => {
-                startTransition(() => {
-                  setShouldRender(true);
-                });
-                mountTimerRef.current = null;
-              }, baseDelay + stagger);
-            }
+            // Try to mount (will be blocked if scrolling)
+            tryMount()
           } else {
-            // Cancel any pending mount since the card scrolled out
+            isInViewRef.current = false
+            // Cancel any pending mount
             if (mountTimerRef.current) {
-              clearTimeout(mountTimerRef.current);
-              mountTimerRef.current = null;
+              clearTimeout(mountTimerRef.current)
+              mountTimerRef.current = null
             }
-            // Debounce unmount by 800ms so we do not unmount immediately if user scrolls back quickly
+            // Unmount after delay
             if (shouldRenderRef.current && !unmountTimerRef.current) {
               unmountTimerRef.current = setTimeout(() => {
                 startTransition(() => {
-                  setShouldRender(false);
-                });
-                unmountTimerRef.current = null;
-              }, 800);
+                  setShouldRender(false)
+                })
+                unmountTimerRef.current = null
+              }, 1000)
             }
           }
-        });
+        })
       },
-      { rootMargin: "100px" }
-    );
+      { rootMargin: "50px" }
+    )
 
     if (ref.current) {
-      observer.observe(ref.current);
+      observer.observe(ref.current)
     }
 
     return () => {
-      observer.disconnect();
-      if (mountTimerRef.current) clearTimeout(mountTimerRef.current);
-      if (unmountTimerRef.current) clearTimeout(unmountTimerRef.current);
-    };
-  }, []);
+      observer.disconnect()
+      scrollListeners.delete(tryMount)
+      if (mountTimerRef.current) clearTimeout(mountTimerRef.current)
+      if (unmountTimerRef.current) clearTimeout(unmountTimerRef.current)
+    }
+  }, [tryMount])
 
   return (
     <Card 
       ref={ref} 
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
-      className="overflow-hidden group cursor-pointer relative bg-card border-border/40 hover:border-primary/50 transition-[border-color,box-shadow] duration-300 hover:shadow-2xl flex flex-col h-full will-change-[box-shadow] transform-gpu"
+      className="overflow-hidden group cursor-pointer relative bg-card border-border/40 hover:border-primary/50 transition-[border-color,box-shadow] duration-300 hover:shadow-2xl flex flex-col h-full transform-gpu"
       style={{ contentVisibility: "auto", containIntrinsicSize: "0 500px" } as React.CSSProperties}
     >
       {/* Animated Glow Effect on Hover */}
@@ -90,7 +126,7 @@ function TemplateCard({ template }: { template: Template }) {
       
       <div className="h-56 overflow-hidden relative z-10 bg-black flex items-center justify-center" style={{ contain: "strict" }}>
         
-        {/* Abstract Background Placeholder while off-screen or loading */}
+        {/* Gradient placeholder while preview not yet loaded */}
         {!shouldRender && (
           <div className="absolute inset-0 transition-opacity duration-700"
                style={{ 
@@ -99,10 +135,10 @@ function TemplateCard({ template }: { template: Template }) {
           />
         )}
 
-        {/* The Live Preview - Only mounts when near viewport */}
+        {/* The Live Preview - Only mounts when scroll has stopped and card is in viewport */}
         {shouldRender && (
           <div className={`absolute w-[1280px] h-[800px] pointer-events-none transform origin-top left-1/2 top-0 -translate-x-1/2 scale-[0.30] group-hover:scale-[0.32] transition-[transform,opacity] duration-500 ease-out ${isHovered ? "opacity-100" : "opacity-90"}`}>
-            <TemplatePreview template={template} scale={1} />
+            <TemplatePreview template={template} scale={1} isPreview={true} />
           </div>
         )}
 
@@ -111,13 +147,13 @@ function TemplateCard({ template }: { template: Template }) {
         
         {/* Top Badges */}
         <div className="absolute top-3 left-3 z-30 flex flex-col gap-2 items-start">
-          <Badge variant="secondary" className="backdrop-blur-md bg-background/80 text-xs border-primary/20 shadow-sm font-semibold">
+          <Badge variant="secondary" className="bg-background/80 text-xs border-primary/20 shadow-sm font-semibold">
             {template.style}
           </Badge>
         </div>
 
         {/* View Interactive Overlay (appears on hover) */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 bg-black/20 backdrop-blur-[2px]">
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-30 bg-black/20">
            <div className="bg-primary text-primary-foreground px-4 py-2 rounded-full font-bold text-sm flex items-center gap-2 shadow-xl transform translate-y-4 group-hover:translate-y-0 transition-all duration-300">
              <MonitorPlay className="w-4 h-4" /> Live Preview
            </div>
@@ -163,4 +199,3 @@ function TemplateCard({ template }: { template: Template }) {
 }
 
 export default memo(TemplateCard)
-

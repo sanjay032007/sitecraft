@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import dynamic from "next/dynamic";
 import { Template } from "@/lib/data";
@@ -26,9 +26,10 @@ const Interactive3DPreview = dynamic(
 interface TemplatePreviewProps {
   template: Template;
   scale?: number;
+  isPreview?: boolean;
 }
 
-export default function TemplatePreview({ template, scale = 1 }: TemplatePreviewProps) {
+export default function TemplatePreview({ template, scale = 1, isPreview = false }: TemplatePreviewProps) {
   const render = () => {
     switch (template.style) {
       case "Modern":
@@ -36,7 +37,7 @@ export default function TemplatePreview({ template, scale = 1 }: TemplatePreview
       case "Glassmorphism":
         return <GlassmorphismPreview t={template} />;
       case "3D Interactive":
-        return <Interactive3DPreview t={template} />;
+        return <Interactive3DPreview t={template} isPreview={isPreview} />;
       default:
         return <ModernPreview t={template} />;
     }

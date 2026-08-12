@@ -1,4 +1,4 @@
-/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
+﻿/* eslint-disable react/no-unescaped-entities, @typescript-eslint/no-explicit-any, @typescript-eslint/no-unused-vars */
 "use client";
 
 import React, { useRef, useState, Suspense } from 'react';
@@ -155,7 +155,7 @@ function SpatialHeadset({ color }: { color: string }) {
 }
 
 // --- Main Page Component ---
-export const Ecommerce3D = ({ t }: { t: Template }) => {
+export const Ecommerce3D = ({ t, isPreview = false }: { t: Template; isPreview?: boolean }) => {
   const [activeColor, setActiveColor] = useState('#8b5cf6'); // Purple default
   const [cartCount, setCartCount] = useState(0);
 
@@ -211,7 +211,7 @@ export const Ecommerce3D = ({ t }: { t: Template }) => {
 
       {/* 3D Background Canvas */}
       <div className="absolute top-0 left-0 right-0 h-full min-h-[600px] z-10 pointer-events-auto">
-        <Canvas frameloop="demand" camera={{ position: [0, 0, 5.5], fov: 45 }} resize={{ offsetSize: true }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} camera={{ position: [0, 0, 5.5], fov: 45 }} resize={{ offsetSize: true }}>
           <ambientLight intensity={0.5} />
           {/* Environment provides ultra-realistic reflections on the glass visor */}
           <Suspense fallback={null}>
@@ -374,3 +374,4 @@ function BoxIcon(props: any) {
     </svg>
   );
 }
+

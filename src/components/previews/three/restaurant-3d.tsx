@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, react/no-unescaped-entities */
+﻿/* eslint-disable @typescript-eslint/no-unused-vars, react-hooks/immutability, react/no-unescaped-entities */
 "use client";
 
 import React, { useRef, useState, useMemo, Suspense } from 'react';
@@ -391,7 +391,7 @@ function SceneCamera({ scrollProgress }: { scrollProgress: React.MutableRefObjec
   return null;
 }
 
-export function Restaurant3D({ t }: { t: Template }) {
+export function Restaurant3D({ t, isPreview = false }: { t: Template; isPreview?: boolean }) {
   const [selectedTab, setSelectedTab] = useState<"Starters" | "Mains" | "Desserts">("Mains");
   const [reserved, setReserved] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
@@ -417,7 +417,7 @@ export function Restaurant3D({ t }: { t: Template }) {
     ],
     Desserts: [
       { name: "Deconstructed Meyer Lemon Spheres", price: "18", desc: "Lemon curd filled cocoa butter globes, toasted Italian meringue, wild honey crumble." },
-      { name: "Grand Cru Valrhona Soufflé", price: "22", desc: "Warm molten dark chocolate core, madagascar vanilla bean gelato, gold leaf flakes." }
+      { name: "Grand Cru Valrhona SoufflÃ©", price: "22", desc: "Warm molten dark chocolate core, madagascar vanilla bean gelato, gold leaf flakes." }
     ]
   };
 
@@ -425,7 +425,7 @@ export function Restaurant3D({ t }: { t: Template }) {
     <div className="@container w-full h-full relative overflow-hidden bg-[#060606] text-white">
       {/* 3D Scene Background Canvas */}
       <div className="absolute inset-0 z-0 pointer-events-none">
-        <Canvas frameloop="demand" shadows camera={{ position: [0, 2.3, 5.0], fov: 42 }}>
+        <Canvas frameloop={isPreview ? "demand" : "always"} shadows camera={{ position: [0, 2.3, 5.0], fov: 42 }}>
           {/* Ambient Lighting */}
           <ambientLight intensity={0.12} />
           
@@ -527,7 +527,7 @@ export function Restaurant3D({ t }: { t: Template }) {
                 Explore Menu
               </a>
               <span className="text-[9px] text-amber-400/80 font-mono tracking-widest animate-bounce">
-                ↓ Scroll to reveal
+                â†“ Scroll to reveal
               </span>
             </div>
           </div>
@@ -547,7 +547,7 @@ export function Restaurant3D({ t }: { t: Template }) {
             </p>
             <div className="grid grid-cols-3 gap-6 pt-4 border-t border-amber-950/20 text-center">
               <div>
-                <p className="text-[14px] font-serif font-light text-amber-400">14.2°C</p>
+                <p className="text-[14px] font-serif font-light text-amber-400">14.2Â°C</p>
                 <p className="text-[7px] font-mono text-white/40 uppercase tracking-widest mt-1">Cellar Temp</p>
               </div>
               <div>
@@ -667,3 +667,4 @@ export function Restaurant3D({ t }: { t: Template }) {
     </div>
   );
 }
+
